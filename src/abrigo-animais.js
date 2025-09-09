@@ -26,7 +26,6 @@ class AbrigoAnimais {
       }
 
       const resultado = this.processarAnimais(animaisParaProcessar, pessoa1, pessoa2);
-      
       const lista = this.formatarSaida(resultado);
 
       return { lista };
@@ -51,7 +50,6 @@ class AbrigoAnimais {
   }
 
   validarEntradas(pessoa1, pessoa2, animaisParaProcessar) {
-    // Primeiro validar animais válidos e duplicados
     const animaisUnicos = new Set();
     for (const animal of animaisParaProcessar) {
       if (!this.animais[animal]) {
@@ -63,7 +61,6 @@ class AbrigoAnimais {
       animaisUnicos.add(animal);
     }
 
-    // Validar brinquedos válidos e duplicados dentro de cada pessoa
     const validarBrinquedosPessoa = (brinquedos) => {
       const brinquedosUnicos = new Set();
       for (const brinquedo of brinquedos) {
@@ -90,29 +87,20 @@ class AbrigoAnimais {
   processarAnimais(animaisParaProcessar, pessoa1, pessoa2) {
     const resultado = {};
     const contadorAdocoes = { pessoa1: 0, pessoa2: 0 };
-    
-    // Criar cópias dos brinquedos para não modificar os originais
     const brinquedosPessoa1 = [...pessoa1];
     const brinquedosPessoa2 = [...pessoa2];
-
-    // Verificar se há companhia para Loco (qualquer outro animal além dele)
     const temCompanhiaParaLoco = animaisParaProcessar.length > 1 && animaisParaProcessar.includes('Loco');
 
     for (const nomeAnimal of animaisParaProcessar) {
       const animal = this.animais[nomeAnimal];
-      
-      // Verificar quem pode adotar este animal
       const pessoa1Pode = this.podeAdotar(animal, brinquedosPessoa1, nomeAnimal, temCompanhiaParaLoco);
       const pessoa2Pode = this.podeAdotar(animal, brinquedosPessoa2, nomeAnimal, temCompanhiaParaLoco);
 
       let destino = 'abrigo';
 
-      // Aplicar regras de adoção
       if (pessoa1Pode && pessoa2Pode) {
-        // Regra 4: Se ambas podem adotar, ninguém fica com o animal
         destino = 'abrigo';
       } else if (pessoa1Pode && contadorAdocoes.pessoa1 < 3) {
-        // Regra 5: Máximo 3 animais por pessoa
         destino = 'pessoa 1';
         contadorAdocoes.pessoa1++;
       } else if (pessoa2Pode && contadorAdocoes.pessoa2 < 3) {
@@ -120,7 +108,6 @@ class AbrigoAnimais {
         contadorAdocoes.pessoa2++;
       }
 
-      // Regra 3: Gatos não dividem brinquedos
       if (animal.tipo === 'gato' && destino !== 'abrigo') {
         if (destino === 'pessoa 1') {
           this.removerBrinquedosGato(brinquedosPessoa1, animal.brinquedos);
@@ -139,19 +126,16 @@ class AbrigoAnimais {
     if (nomeAnimal === 'Loco' && temCompanhiaParaLoco) {
       return this.temTodosBrinquedos(animal.brinquedos, brinquedosPessoa);
     }
-
     return this.temBrinquedosNaOrdem(animal.brinquedos, brinquedosPessoa);
   }
 
   temBrinquedosNaOrdem(brinquedosNecessarios, brinquedosPessoa) {
     let indice = 0;
-    
     for (const brinquedo of brinquedosPessoa) {
       if (indice < brinquedosNecessarios.length && brinquedo === brinquedosNecessarios[indice]) {
         indice++;
       }
     }
-    
     return indice === brinquedosNecessarios.length;
   }
 
@@ -169,14 +153,11 @@ class AbrigoAnimais {
 
   formatarSaida(resultado) {
     const lista = [];
-    
     const animaisOrdenados = Object.keys(resultado).sort();
-    
     for (const animal of animaisOrdenados) {
       const destino = resultado[animal];
       lista.push(`${animal} - ${destino}`);
     }
-    
     return lista;
   }
 }
